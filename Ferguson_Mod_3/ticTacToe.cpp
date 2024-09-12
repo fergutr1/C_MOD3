@@ -15,33 +15,33 @@ void ticTacToe::printBoard()
     std::cout << std::endl;
 }
 
-//function used to determine if/who has won the game
 int ticTacToe::checkWinner()
 {
     bool gameTie = true;
     winningPlayer = '0';
 
-    //check horizontal
+    //check if there is a horizontal winner
     for (int i = 0; i < 3; i++) {
         if ((equals3(board[i][0], board[i][1], board[i][2])) && ('-' != board[i][0])) {
             winningPlayer = board[i][0];
             break;
         }
     }
-    //check vertical
+    //check if there is a vertical winner
     for (int i = 0; i < 3; i++) {
         if ((equals3(board[0][i], board[1][i], board[2][i])) && ('-' != board[0][i])) {
             winningPlayer = board[0][i];
             break;
         }
     }
-    //check diagonals
+    //check if there is a diagonal winner
     if ((equals3(board[0][0], board[1][1], board[2][2])) || (equals3(board[0][2], board[1][1], board[2][0]))) {
         if ('-' != board[1][1]) {
             winningPlayer = board[1][1];
         }
     }
-    if ('0' == winningPlayer) {//check for a tie
+    //check for a tie
+    if ('0' == winningPlayer) {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if ('-' == board[i][j]) {//if there is an empty space, the game is not over yet
@@ -83,7 +83,7 @@ void ticTacToe::getPlayerMove()
     while (true) {
         std::cout << "Enter your move (row# col#): ";
 
-        //try to read two values from the input string
+        //try to read two integer values from the input
         if (std::cin >> playerMove.xCoordinate >> playerMove.yCoordinate) {
 
             std::cout << std::endl;//formatting
@@ -124,6 +124,9 @@ void ticTacToe::getAiMove() {
 
 ticTacToe::MOVE ticTacToe::miniMax(char board[3][3], int depth, bool maxing)
 {
+    //basic mini-max algorithm that performs a tree search and evalues all possible moves and assigns each final position a weight.
+    //returns the move that results in the least favourable outcome for the player
+
     MOVE aiAttempt;
     aiAttempt.score = checkWinner();
     //if we are at max search depth or the game is done return position evaluation
@@ -131,13 +134,14 @@ ticTacToe::MOVE ticTacToe::miniMax(char board[3][3], int depth, bool maxing)
         return aiAttempt;
     }
 
+    //this block represents the moves that the player would make (best in each position)
     if (maxing) {
         aiAttempt.score = ticTacToe::LOSE;//initialize with lowest possible score
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {//iterate through each space of the board and check if its available
             for (int j = 0; j < 3; j++) {
                 if (board[i][j] == '-') {
                     board[i][j] = 'X';//try a move if its available
-                    MOVE tempMove = miniMax(board, depth - 1, false);
+                    MOVE tempMove = miniMax(board, depth - 1, false);//player just made a move, now let the AI make amove
                     if (tempMove.score >= aiAttempt.score) {//is the current position better for player than previous one?
                         //store the coordinates of the best move 
                         aiAttempt.score = tempMove.score;
@@ -150,15 +154,16 @@ ticTacToe::MOVE ticTacToe::miniMax(char board[3][3], int depth, bool maxing)
         }
         return aiAttempt;
     }
+    //this block represents the moves that the AI would make (worst for the player in each position)
     else {
         aiAttempt.score = ticTacToe::WIN;//initialize with highest possible score
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {//iterate through each space of the board and check if its available
             for (int j = 0; j < 3; j++) {
                 if (board[i][j] == '-') {
                     board[i][j] = 'O';//try a move if its available
-                    MOVE tempMove = miniMax(board, depth - 1, true);
+                    MOVE tempMove = miniMax(board, depth - 1, true);//ai made a move, let the player make a move
                     if (tempMove.score <= aiAttempt.score) {//is the current position worse for opponent than previous one?
-                        //store the coordinates of the best move 
+                        //store the coordinates of the worst move 
                         aiAttempt.score = tempMove.score;
                         aiAttempt.xCoordinate = i;
                         aiAttempt.yCoordinate = j;

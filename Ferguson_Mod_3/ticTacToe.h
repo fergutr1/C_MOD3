@@ -53,7 +53,7 @@ private:
     //returns the coordinates of the best move in the position
     MOVE miniMax(char board[3][3], int depth, bool maxing);
 
-    //a function to simplify the checkWinner function
+    //a function to simplify the checkWinner function. Compares 3 chars and returns true if they are equal
     bool equals3(char a, char b, char c);
 
 };
